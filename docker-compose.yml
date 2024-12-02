@@ -3,7 +3,7 @@
 name: events
 
 services:
-  event-service:
+  events:
     build: .
     ports:
       - "8004:8004"
