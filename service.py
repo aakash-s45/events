@@ -22,7 +22,7 @@ async def add_music(request: Request, data: AddMusicModel):
     status, msg, validated_data = validate_music(data)
     if not status:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=500,
             detail=f"Validation error: {msg}",
         )
     query = """
@@ -62,7 +62,7 @@ async def add_music(request: Request, data: AddMusicModel):
 
 def validate_music(data: AddMusicModel):
     status, msg, resp = lookup_track_mb(data.title, data.artist, data.album or "")
-    if status != "success":
+    if not status:
         logger.error(f"Track lookup failed: {msg}")
         return False, "Track lookup failed", {}
 
