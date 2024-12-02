@@ -1,4 +1,4 @@
-version: '3.8'
+#version: '3.8'
 
 name: events
 
@@ -6,6 +6,6 @@ services:
   event-service:
     build: .
     ports:
-      - "8007:8007"
+      - "8004:8004"
     env_file:
       - .env  # Load the .env file

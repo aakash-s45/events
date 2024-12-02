@@ -61,9 +61,9 @@ async def add_music(request: Request, data: AddMusicModel):
 
 
 def validate_music(data: AddMusicModel):
-    status, resp = lookup_track_mb(data.title, data.artist, data.album or "")
+    status, msg, resp = lookup_track_mb(data.title, data.artist, data.album or "")
     if status != "success":
-        logger.error(f"Track lookup failed: {resp}")
+        logger.error(f"Track lookup failed: {msg}")
         return False, "Track lookup failed", {}
 
     data_model = data.model_dump()
