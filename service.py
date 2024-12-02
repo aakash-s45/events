@@ -106,7 +106,7 @@ def lookup_track_mb(
                     result["release_id"] = recording["releases"][0].get("id")
                     result["release_title"] = recording["releases"][0].get("title")
                     result["release_status"] = recording["releases"][0].get("status")
-                return "success", result
+                return True, "success", result
         return False, "No results found", {}
     except json.JSONDecodeError:
         return False, "Invalid JSON response", {}
