@@ -39,15 +39,9 @@ async def lifespan(app: FastAPI):
 
 async def init_db(app: FastAPI):
     logger.info("initializing database connection")
-    conn = await asyncpg.connect(
-        user=DB_USER,
-        password=DB_PASS,
-        port=DB_PORT,
-        host=DB_HOST,
-        database=DB_NAME,
-    )
-    app.db = conn
-
+    dsn = f"postgres://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    pool = await asyncpg.create_pool(dsn)
+    app.db = pool
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

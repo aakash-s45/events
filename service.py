@@ -50,7 +50,8 @@ async def add_music(request: Request, data: AddMusicModel):
     }
     
     try:
-        await request.app.db.execute(query, *db_data.values())
+        async with request.app.db.acquire() as con:
+            await con.execute(query, *db_data.values())
     except Exception as e:
         logger.error(f"Database error: {str(e)}", exc_info=True)
         raise HTTPException(
@@ -201,7 +202,8 @@ async def get_current_playing(request: Request):
     """
     data: List[Record] = None
     try:
-        data = await request.app.db.fetch(query)
+        async with request.app.db.acquire() as con:
+            data = await con.fetch(query)
     except Exception as e:
         logger.error(f"Database error: {str(e)}", exc_info=True)
         raise HTTPException(
