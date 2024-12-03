@@ -4,6 +4,8 @@ name: events
 
 services:
   events:
+    restart: on-failure
+    network_mode: "host"
     build: .
     ports:
       - "8004:8004"
