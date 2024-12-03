@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
 
 async def init_db(app: FastAPI):
     logger.info("initializing database connection")
-    dsn = f"postgres://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    dsn = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     pool = await asyncpg.create_pool(dsn)
     app.db = pool
 
