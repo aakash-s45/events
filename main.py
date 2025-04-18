@@ -18,8 +18,6 @@ def get_app() -> FastAPI:
     )
 
     origins = [
-        "*",
-        "http://localhost",
         "http://localhost:3000",
     ]
 
