@@ -53,7 +53,7 @@ async def add_music(request: Request, data: AddMusicModel):
         "bundle": validated_data.get("bundle"),
         "elapsed": validated_data.get("elapsed"),
         "deviceName": validated_data.get("deviceName"),
-        "images": f"NULLIF({json.dumps(validated_data.get('images'))}, 'null')",
+        "images": json.dumps(validated_data.get('images')) if validated_data.get('images') else None,
         "is_valid": status,
     }
     
@@ -203,7 +203,7 @@ def get_cover_art(request: Request, release_id: str):
 
 async def get_current_playing(request: Request):
     query = """
-    select title , artist , album , release_id , duration , playbackrate , bundle , elapsed , devicename , updated
+    select title , artist , album , release_id , duration , playbackrate , elapsed , devicename , updated, images
     from events e
     where is_deleted = false
     and is_valid = true
