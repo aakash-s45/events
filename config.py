@@ -45,6 +45,11 @@ async def init_db(app: FastAPI):
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        print("*******")
+        print("*******")
+        print(request.headers.get("Authorization"))
+        print("*******")
+        print("*******")
         # Extract the Authorization header
         token = request.headers.get("Authorization")
         if not token:
