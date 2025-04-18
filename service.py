@@ -46,7 +46,7 @@ async def add_music(request: Request, data: AddMusicModel):
         "artist_id": validated_data.get("artist_id"),
         "album": data.album or validated_data.get("album"),
         "release_id": validated_data.get("release_id"),
-        "duration": data.durationvalidated_data.get("duration"),
+        "duration": data.duration or validated_data.get("duration"),
         "playbackRate": validated_data.get("playbackRate"),
         "bundle": validated_data.get("bundle"),
         "elapsed": data.elapsed or validated_data.get("elapsed"),
