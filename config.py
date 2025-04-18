@@ -46,6 +46,8 @@ async def init_db(app: FastAPI):
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Extract the Authorization header
+        if request.url.path.startswith("/api/v1/add-music"):
+            return await call_next(request)
         token = request.headers.get("Authorization")
         if not token:
             raise HTTPException(status_code=401, detail="Missing Authorization header")
