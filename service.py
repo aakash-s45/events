@@ -17,8 +17,15 @@ from validation import AddMusicModel
 
 logger = logging.getLogger(__name__)
 
+last_added:str = ""
 
 async def add_music(request: Request, data: AddMusicModel):
+    global last_added
+    key = f"{data.title}-{data.artist}-{data.album}"
+    if key == last_added:
+        logger.info(f"Duplicate request for {key}, skipping")
+        return JSONResponse(content={"message": "Duplicate request"}, status_code=200)
+    last_added = key
     status, msg, validated_data = validate_music(data)
     if not status:
         raise HTTPException(
@@ -63,8 +70,8 @@ async def add_music(request: Request, data: AddMusicModel):
 
 
 def validate_music(data: AddMusicModel):
-    status, msg, resp = lookup_track_mb(data.title, data.artist, data.album or "")
-    # status, msg, resp = lookup_track_lastfm(data.title, data.artist)
+    # status, msg, resp = lookup_track_mb(data.title, data.artist, data.album or "")
+    status, msg, resp = lookup_track_lastfm(data.title, data.artist)
     if not status:
         logger.error(f"Track lookup failed: {msg}")
         return False, "Track lookup failed", {}
