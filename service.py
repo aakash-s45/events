@@ -222,7 +222,6 @@ async def get_current_playing(request: Request):
         )
     if not data:
         return JSONResponse(content={"message": "No current playing"}, status_code=404)
-    data = data[0]
-    data["images"] = json.loads(data.get("images"))
-    response = jsonable_encoder(data)
+    response = jsonable_encoder(data[0])
+    response["images"] = json.loads(response.get("images"))
     return JSONResponse(content=response, status_code=200)
