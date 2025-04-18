@@ -53,7 +53,7 @@ async def add_music(request: Request, data: AddMusicModel):
         "bundle": validated_data.get("bundle"),
         "elapsed": validated_data.get("elapsed"),
         "deviceName": validated_data.get("deviceName"),
-        "images": f"NULLIF({json.dumps(validated_data.get("images"))}, 'null')",
+        "images": f"NULLIF({json.dumps(validated_data.get('images'))}, 'null')",
         "is_valid": status,
     }
     
