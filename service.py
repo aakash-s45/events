@@ -28,10 +28,8 @@ async def add_music(request: Request, data: AddMusicModel):
     last_added = key
     status, msg, validated_data = validate_music(data)
     if not status:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Validation error: {msg}",
-        )
+        logger.error(f"Validation error: {msg}")
+        
     query = """
         INSERT INTO events
         (title, recording_id, artist, artist_id, album, release_id, duration, playbackRate, bundle, elapsed, deviceName, images, is_valid, playcount) 
@@ -42,16 +40,16 @@ async def add_music(request: Request, data: AddMusicModel):
         playcount = events.playcount + 1, updated = now();
     """
     db_data = {
-        "title": validated_data["title"],
+        "title": data.title or validated_data["title"],
         "recording_id": validated_data.get("recording_id"),
-        "artist": validated_data.get("artist"),
+        "artist": data.artist or validated_data.get("artist"),
         "artist_id": validated_data.get("artist_id"),
-        "album": validated_data.get("album"),
+        "album": data.album or validated_data.get("album"),
         "release_id": validated_data.get("release_id"),
-        "duration": validated_data.get("duration"),
+        "duration": data.durationvalidated_data.get("duration"),
         "playbackRate": validated_data.get("playbackRate"),
         "bundle": validated_data.get("bundle"),
-        "elapsed": validated_data.get("elapsed"),
+        "elapsed": data.elapsed or validated_data.get("elapsed"),
         "deviceName": validated_data.get("deviceName"),
         "images": json.dumps(validated_data.get('images')) if validated_data.get('images') else None,
         "is_valid": status,
