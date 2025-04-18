@@ -157,7 +157,7 @@ def lookup_track_lastfm(title: str, artist: str, retry: int = 5) -> Tuple[str, d
         result["artist_id"] = data.get("artist", {}).get("mbid")
         result["album"] = data.get("album", {}).get("title")
         result["release_id"] = data.get("album", {}).get("mbid")
-        result["duration"] = int(data.get("duration", 0))
+        result["duration"] = float(data.get("duration", 0))/1000
         result["images"] = data.get("album", {}).get("image", [])
         return True, "success", result
 
