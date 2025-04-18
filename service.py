@@ -205,7 +205,7 @@ async def get_current_playing(request: Request):
     from events e
     where is_deleted = false
     and is_valid = true
-    order by created desc
+    order by updated desc
     limit 1;
     """
     data: List[Record] = None
