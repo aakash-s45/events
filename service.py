@@ -63,6 +63,7 @@ async def add_music(request: Request, data: AddMusicModel):
 
 def validate_music(data: AddMusicModel):
     status, msg, resp = lookup_track_mb(data.title, data.artist, data.album or "")
+    # status, msg, resp = lookup_track_lastfm(data.title, data.artist, data.album or "")
     if not status:
         logger.error(f"Track lookup failed: {msg}")
         return False, "Track lookup failed", {}
@@ -87,7 +88,7 @@ def lookup_track_mb(
 
     status, reason, response = make_api_request(base_url, "GET", params=params)
     if not status:
-        if reason.startswith("rate limit"):
+        if retry > 0:
             return lookup_track_lastfm(title, artist, retry=retry - 1)
         return False, "request failed", {}
 
@@ -115,7 +116,7 @@ def lookup_track_mb(
 
 
 # Lookup Track from last.fm
-def lookup_track_lastfm(title: str, artist: str, retry: int = 4) -> Tuple[str, dict]:
+def lookup_track_lastfm(title: str, artist: str, retry: int = 5) -> Tuple[str, dict]:
     if retry < 0:
         return False, "No results found after multiple attempts", {}
     base_url = f"{THE_LAST_FM_BASE_URL}/2.0"
@@ -123,14 +124,14 @@ def lookup_track_lastfm(title: str, artist: str, retry: int = 4) -> Tuple[str, d
     params = {
         "format": "json",
         "method": "track.getInfo",
-        "apikey": LAST_FM_API_KEY,
+        "api_key": LAST_FM_API_KEY,
         "artist": artist,
         "track": title,
     }
 
     status, reason, response = make_api_request(base_url, "GET", params=params)
     if not status:
-        if reason.startswith("rate limit"):
+        if retry:
             return lookup_track_mb(title, artist, retry=retry - 1)
         return False, "request failed", {}
     try:
