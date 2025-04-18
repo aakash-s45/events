@@ -27,8 +27,8 @@ async def add_music(request: Request, data: AddMusicModel):
         )
     query = """
         INSERT INTO events
-        (title, recording_id, artist, artist_id, album, release_id, duration, playbackRate, bundle, elapsed, deviceName, is_valid, playcount) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 1)
+        (title, recording_id, artist, artist_id, album, release_id, duration, playbackRate, bundle, elapsed, deviceName, images, is_valid, playcount) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 1)
         ON CONFLICT (title, artist, album)
         DO UPDATE SET 
         playbackRate = $8, bundle = $9, elapsed = $10, deviceName = $11, 
@@ -46,6 +46,7 @@ async def add_music(request: Request, data: AddMusicModel):
         "bundle": validated_data.get("bundle"),
         "elapsed": validated_data.get("elapsed"),
         "deviceName": validated_data.get("deviceName"),
+        "images": json.dumps(validated_data.get("images")),
         "is_valid": status,
     }
     
@@ -63,7 +64,7 @@ async def add_music(request: Request, data: AddMusicModel):
 
 def validate_music(data: AddMusicModel):
     status, msg, resp = lookup_track_mb(data.title, data.artist, data.album or "")
-    # status, msg, resp = lookup_track_lastfm(data.title, data.artist, data.album or "")
+    # status, msg, resp = lookup_track_lastfm(data.title, data.artist)
     if not status:
         logger.error(f"Track lookup failed: {msg}")
         return False, "Track lookup failed", {}
@@ -150,6 +151,7 @@ def lookup_track_lastfm(title: str, artist: str, retry: int = 5) -> Tuple[str, d
         result["album"] = data.get("album", {}).get("title")
         result["release_id"] = data.get("album", {}).get("mbid")
         result["duration"] = int(data.get("duration", 0))
+        result["images"] = data.get("album", {}).get("image", [])
         return True, "success", result
 
     except json.JSONDecodeError:

@@ -28,4 +28,4 @@ COPY . .
 EXPOSE 8004
 
 # Command to run the app
-CMD ["uvicorn", "main:app", "--reload", "--port", "8004", "--host", "0.0.0.0"]
+CMD ["uvicorn", "main:app", "--port", "8004", "--host", "0.0.0.0"]
