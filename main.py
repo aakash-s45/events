@@ -19,7 +19,8 @@ def get_app() -> FastAPI:
 
     origins = [
         "http://localhost:3000",
-        "https://website-git-main-aakash-s45s-projects.vercel.app/"
+        "https://website-git-main-aakash-s45s-projects.vercel.app/",
+        "*"
     ]
 
     app.add_middleware(
