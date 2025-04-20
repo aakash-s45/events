@@ -10,3 +10,5 @@ services:
       - "8004:8004"
     env_file:
       - .env  # Load the .env file
+    volumes:
+      - ./app/static:/app/static  # Mount static image folder

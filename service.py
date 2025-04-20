@@ -1,23 +1,45 @@
+import base64
 import json
 import logging
+import os
 from typing import List, Optional, Tuple
+import uuid
 from asyncpg import Record
 from fastapi import HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from constant import STATIC_DIR
 from settings import (
+    APP_URL,
     COVERT_ART_ARCHIVE_BASE_URL,
     LAST_FM_API_KEY,
     MUSICBRAINZ_BASE_URL,
     THE_LAST_FM_BASE_URL,
 )
-from utils import make_api_request
+from utils import guess_file_ext_from_base64, make_api_request
 from validation import AddMusicModel
 
 logger = logging.getLogger(__name__)
 
-last_added:str = ""
+last_added: str = ""
+
+
+def save_cover_art(image_str: str):
+    if not image_str:
+        return None
+    image_str = image_str.strip()
+
+    file_ext = guess_file_ext_from_base64(image_str)
+    filename = f"{uuid.uuid4()}.{file_ext}"
+    file_path = os.path.join(STATIC_DIR, filename)
+
+    image_data = base64.b64decode(image_str)
+    with open(file_path, "wb") as f:
+        f.write(image_data)
+
+    return {"filename": filename, "file_path": file_path}
+
 
 async def add_music(request: Request, data: AddMusicModel):
     global last_added
@@ -29,7 +51,18 @@ async def add_music(request: Request, data: AddMusicModel):
     status, msg, validated_data = validate_music(data)
     if not status:
         logger.error(f"Validation error: {msg}")
-        
+
+    validated_data["images"] = ""
+    if not validated_data.get("images") and data.image:
+        response = save_cover_art(data.image)
+        if response:
+            validated_data["images"] = [
+                {
+                    "size": "normal",
+                    "#text": f"{APP_URL}/static/{response.get('filename')}",
+                },
+            ]
+
     query = """
         INSERT INTO events
         (title, recording_id, artist, artist_id, album, release_id, duration, playbackRate, bundle, elapsed, deviceName, images, is_valid, playcount) 
@@ -51,10 +84,14 @@ async def add_music(request: Request, data: AddMusicModel):
         "bundle": validated_data.get("bundle"),
         "elapsed": data.elapsed or validated_data.get("elapsed"),
         "deviceName": validated_data.get("deviceName"),
-        "images": json.dumps(validated_data.get('images')) if validated_data.get('images') else None,
+        "images": (
+            json.dumps(validated_data.get("images"))
+            if validated_data.get("images")
+            else None
+        ),
         "is_valid": status,
     }
-    
+
     try:
         async with request.app.db.acquire() as con:
             await con.execute(query, *db_data.values())
@@ -155,7 +192,7 @@ def lookup_track_lastfm(title: str, artist: str, retry: int = 5) -> Tuple[str, d
         result["artist_id"] = data.get("artist", {}).get("mbid")
         result["album"] = data.get("album", {}).get("title")
         result["release_id"] = data.get("album", {}).get("mbid")
-        result["duration"] = float(data.get("duration", 0))/1000
+        result["duration"] = float(data.get("duration", 0)) / 1000
         result["images"] = data.get("album", {}).get("image", [])
         return True, "success", result
 
@@ -221,5 +258,7 @@ async def get_current_playing(request: Request):
     if not data:
         return JSONResponse(content={"message": "No current playing"}, status_code=404)
     response = jsonable_encoder(data[0])
-    response["images"] = json.loads(response.get("images")) if response.get("images") else None
+    response["images"] = (
+        json.loads(response.get("images")) if response.get("images") else None
+    )
     return JSONResponse(content=response, status_code=200)

@@ -7,6 +7,7 @@ load_dotenv()
 
 DEBUG = True
 APP_NAME = getenv('APP_NAME')
+APP_URL = getenv('APP_URL')
 APP_VERSION = getenv('APP_VERSION')
 APP_EMAIL = getenv('APP_EMAIL')
 BASE_ROUTE = getenv('BASE_ROUTE')

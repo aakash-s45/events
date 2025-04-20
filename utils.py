@@ -40,3 +40,18 @@ def make_api_request(url, method, params=None, json=None, headers=None):
         logger.error(f"request failed due to {e}", exc_info=True)
         return False, "failed", None
     return True, "succes", response
+
+
+def guess_file_ext_from_base64(b64_str: str) -> str:
+    if b64_str.startswith('iVBORw0KGgo'):
+        return 'png'
+    elif b64_str.startswith('/9j/'):
+        return 'jpg'
+    elif b64_str.startswith('R0lGOD') or b64_str.startswith('R0lFOw'):
+        return 'gif'
+    elif b64_str.startswith('UklGR'):
+        return 'webp'
+    elif b64_str.startswith('JVBERi0'):
+        return 'pdf'
+    else:
+        return 'unknown'

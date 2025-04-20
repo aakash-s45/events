@@ -11,6 +11,7 @@ class AddMusicModel(BaseModel):
     bundle: Optional[str] = ""
     elapsed: Optional[float] = 0.0
     deviceName: Optional[str] = ""
+    image: Optional[str] = ""
 
 
 class GetCoverArtModel(BaseModel):

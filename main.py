@@ -1,8 +1,11 @@
+import os
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 
 from config import AuthMiddleware, generic_error_handler, http_error_handler, lifespan
+from constant import STATIC_DIR
 from settings import BASE_ROUTE
 from routes import api_v1
 
@@ -16,6 +19,9 @@ def get_app() -> FastAPI:
         version="1.0.0",
         lifespan=lifespan,
     )
+    
+    os.makedirs(STATIC_DIR, exist_ok=True)
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
     origins = [
         "http://localhost:3000",
