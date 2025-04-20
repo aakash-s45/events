@@ -51,12 +51,12 @@ async def add_music(request: Request, data: AddMusicModel):
     if key == last_added:
         logger.info(f"Duplicate request for {key}, skipping")
         return JSONResponse(content={"message": "Duplicate request"}, status_code=200)
+    
     last_added = key
     status, msg, validated_data = validate_music(data)
     if not status:
         logger.error(f"Validation error: {msg}")
 
-    validated_data["images"] = ""
     if not validated_data.get("images") and data.image:
         response = save_cover_art(data.image)
         if response:
