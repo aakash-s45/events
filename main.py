@@ -5,8 +5,7 @@ from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 
 from config import AuthMiddleware, generic_error_handler, http_error_handler, lifespan
-from constant import STATIC_DIR
-from settings import BASE_ROUTE
+from settings import BASE_ROUTE, STATIC_DIR
 from routes import api_v1
 
 

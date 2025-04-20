@@ -30,7 +30,7 @@ async def generic_error_handler(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db(app)
-
+    
     yield
 
     await app.db.close()
@@ -42,6 +42,7 @@ async def init_db(app: FastAPI):
     dsn = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     pool = await asyncpg.create_pool(dsn)
     app.db = pool
+    logger.info("database connection initialized")
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

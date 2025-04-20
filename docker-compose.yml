@@ -11,4 +11,5 @@ services:
     env_file:
       - .env  # Load the .env file
     volumes:
-      - ./app/static:/app/static  # Mount static image folder
+      - ./static:/app/static
+  

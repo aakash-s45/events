@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime, timedelta
 import json
 import logging
 import os
@@ -9,12 +10,12 @@ from fastapi import HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-from constant import STATIC_DIR
 from settings import (
     APP_URL,
     COVERT_ART_ARCHIVE_BASE_URL,
     LAST_FM_API_KEY,
     MUSICBRAINZ_BASE_URL,
+    STATIC_DIR,
     THE_LAST_FM_BASE_URL,
 )
 from utils import guess_file_ext_from_base64, make_api_request
@@ -23,6 +24,9 @@ from validation import AddMusicModel
 logger = logging.getLogger(__name__)
 
 last_added: str = ""
+cached_current_playing: dict = {}
+cache_last_updated:datetime = datetime.now()
+cache_ttl = 3600
 
 
 def save_cover_art(image_str: str):
@@ -101,6 +105,8 @@ async def add_music(request: Request, data: AddMusicModel):
             status_code=500,
             detail=f"Database error: {str(e)}",
         )
+    global cached_current_playing
+    cached_current_playing = {}
     return JSONResponse(content={"message": "Data saved successfully"}, status_code=200)
 
 
@@ -245,6 +251,14 @@ async def get_current_playing(request: Request):
     order by updated desc
     limit 1;
     """
+    global cached_current_playing
+    global cache_last_updated
+    global cache_ttl
+
+    now = datetime.now()
+    if cached_current_playing and (now - cache_last_updated < timedelta(seconds=cache_ttl)):
+        return JSONResponse(content=cached_current_playing, status_code=200)
+    
     data: List[Record] = None
     try:
         async with request.app.db.acquire() as con:
@@ -261,4 +275,7 @@ async def get_current_playing(request: Request):
     response["images"] = (
         json.loads(response.get("images")) if response.get("images") else None
     )
+    cached_current_playing = response
+    cache_last_updated = datetime.now()
+
     return JSONResponse(content=response, status_code=200)

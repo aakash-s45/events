@@ -37,3 +37,4 @@ LAST_FM_API_KEY = getenv('LAST_FM_API_KEY')
 
 MB_RATE_LIMIT = int(getenv('MB_RATE_LIMIT', 2))
 LFM_RATE_LIMIT = int(getenv('LFM_RATE_LIMIT', 2))
+STATIC_DIR = getenv('STATIC_DIR', "static")
