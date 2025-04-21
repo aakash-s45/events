@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
+from cache import InMemoryCache
 from settings import AUTH_TOKEN, DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -30,6 +31,7 @@ async def generic_error_handler(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db(app)
+    app.cache = InMemoryCache()
     
     yield
 
