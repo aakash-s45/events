@@ -46,6 +46,8 @@ def save_cover_art(image_str: str):
 async def add_music(request: Request, data: AddMusicModel):
     global last_added
     key = f"{data.title}-{data.artist}-{data.album}"
+    if not data.duration:
+        return JSONResponse(content={"message": "Missing duration"}, status_code=400)
     if key == last_added:
         logger.info(f"Duplicate request for {key}, skipping")
         return JSONResponse(content={"message": "Duplicate request"}, status_code=200)
