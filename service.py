@@ -57,6 +57,15 @@ async def add_music(request: Request, data: AddMusicModel):
     if not status:
         logger.error(f"Validation error: {msg}")
 
+    if not validated_data.get("images") and data.artworkUrl:
+        validated_data["images"] = [
+            {
+                "size": "normal",
+                "#text": data.artworkUrl,
+            },
+        ]
+
+
     if not validated_data.get("images") and data.image:
         response = save_cover_art(data.image)
         if response:
@@ -66,8 +75,6 @@ async def add_music(request: Request, data: AddMusicModel):
                     "#text": f"{APP_URL}/static/{response.get('filename')}",
                 },
             ]
-    validated_data["images"] = validated_data.get("images") or data.artworkUrl
-    print("validated_data", validated_data)
 
     query = """
         INSERT INTO events
