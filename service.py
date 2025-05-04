@@ -66,8 +66,8 @@ async def add_music(request: Request, data: AddMusicModel):
                     "#text": f"{APP_URL}/static/{response.get('filename')}",
                 },
             ]
-
     validated_data["images"] = validated_data.get("images") or data.artworkUrl
+    print("validated_data", validated_data)
 
     query = """
         INSERT INTO events
