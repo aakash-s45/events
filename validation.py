@@ -11,6 +11,8 @@ class AddMusicModel(BaseModel):
     bundle: Optional[str] = ""
     elapsed: Optional[float] = 0.0
     deviceName: Optional[str] = ""
+    artworkUrl: Optional[str] = ""
+    pageTitle: Optional[str] = ""
     image: Optional[str] = ""
 
 

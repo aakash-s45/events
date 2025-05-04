@@ -45,7 +45,7 @@ def save_cover_art(image_str: str):
 
 async def add_music(request: Request, data: AddMusicModel):
     global last_added
-    key = f"{data.title}-{data.artist}-{data.album}"
+    key = f"{data.title}-{data.artist}-{data.album}-{data.playbackRate}"
     if not data.duration:
         return JSONResponse(content={"message": "Missing duration"}, status_code=400)
     if key == last_added:
@@ -66,6 +66,8 @@ async def add_music(request: Request, data: AddMusicModel):
                     "#text": f"{APP_URL}/static/{response.get('filename')}",
                 },
             ]
+
+    validated_data["images"] = validated_data.get("images") or data.artworkUrl
 
     query = """
         INSERT INTO events
