@@ -82,7 +82,7 @@ async def add_music(request: Request, data: AddMusicModel):
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 1)
         ON CONFLICT (title, artist, album)
         DO UPDATE SET 
-        playbackRate = $8, bundle = $9, elapsed = $10, deviceName = $11, 
+        playbackRate = $8, bundle = $9, elapsed = $10, deviceName = $11, images = $12,
         playcount = events.playcount + 1, updated = now();
     """
     db_data = {
