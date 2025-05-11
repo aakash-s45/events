@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Request
 
+from email_service import send_email
 from service import add_music, get_cover_art, get_current_playing
-from validation import AddMusicModel
+from validation import AddMusicModel, EmailRequest
 
 
 api_v1 = APIRouter()
@@ -30,3 +31,7 @@ async def _get_cover_art(request: Request, release_id: str):
 @api_v1.get("/current-playing")
 async def _get_current_playing(request: Request):
     return await get_current_playing(request) 
+
+@api_v1.post("/send-email")
+async def _send_email(request: Request, data: EmailRequest):
+    return await send_email(data.email, data.subject, data.body)

@@ -7,6 +7,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from cache import InMemoryCache
+from email_service import init_fastmail
 from settings import AUTH_TOKEN, DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME
 from starlette.middleware.base import BaseHTTPMiddleware
 

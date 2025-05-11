@@ -19,3 +19,9 @@ class AddMusicModel(BaseModel):
 class GetCoverArtModel(BaseModel):
     # mbid of album
     release_id: Optional[str] = ""
+
+
+class EmailRequest(BaseModel):
+    email: str
+    subject: str
+    body: str
