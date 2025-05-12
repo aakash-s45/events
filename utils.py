@@ -3,13 +3,14 @@ import requests
 from datetime import datetime
 from urllib.parse import urlparse
 
-from settings import APP_NAME, LFM_RATE_LIMIT, MUSICBRAINZ_BASE_URL, THE_LAST_FM_BASE_URL, MB_RATE_LIMIT
+from settings import APP_NAME, LFM_RATE_LIMIT, MUSICBRAINZ_BASE_URL, OPENWEATHER_API_URL, THE_LAST_FM_BASE_URL, MB_RATE_LIMIT
 
 logger = logging.getLogger(__name__)
 last_call_timestamps = {}
 rate_limits = {
-    THE_LAST_FM_BASE_URL: LFM_RATE_LIMIT,
-    MUSICBRAINZ_BASE_URL: MB_RATE_LIMIT,
+    THE_LAST_FM_BASE_URL.split("//")[-1]: LFM_RATE_LIMIT,
+    MUSICBRAINZ_BASE_URL.split("//")[-1]: MB_RATE_LIMIT,
+    OPENWEATHER_API_URL.split("//")[-1]: 0,
 }
 
 def make_api_request(url, method, params=None, json=None, headers=None):

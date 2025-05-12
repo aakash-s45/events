@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 
 from email_service import send_email
 from service import add_music, get_cover_art, get_current_playing
 from validation import AddMusicModel, EmailRequest
+from weather import get_current_weather
 
 
 api_v1 = APIRouter()
@@ -35,3 +37,7 @@ async def _get_current_playing(request: Request):
 @api_v1.post("/send-email")
 async def _send_email(request: Request, data: EmailRequest):
     return await send_email(data.email, data.subject, data.body)
+
+@api_v1.get("/weather")
+async def _get_current_weather(request: Request):
+    return get_current_weather(request)
