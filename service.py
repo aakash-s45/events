@@ -60,13 +60,15 @@ async def add_music(request: Request, data: AddMusicModel):
     if not status:
         logger.error(f"Validation error: {msg}")
 
-    if not validated_data.get("images") and data.artworkUrl:
-        validated_data["images"] = [
+    
+    if data.artworkUrl:
+        validated_data["images"] = validated_data["images"] or []
+        validated_data["images"].append(
             {
-                "size": "normal",
+                "size": "source",
                 "#text": data.artworkUrl,
-            },
-        ]
+            }
+        )
 
 
     if not validated_data.get("images") and data.image:
