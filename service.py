@@ -308,18 +308,14 @@ def download_and_save_image(image_url: str, image_filename: str = 'current_playi
     - Return the local static link
     """
     
-    static_path = os.path.join(STATIC_DIR, image_filename)
-    if os.path.exists(static_path):
-        os.remove(static_path)
-    
     if not image_url:
         return None
-    
     
     response = request('GET', image_url)
     if response.status_code != 200:
         return None
     
+    static_path = os.path.join(STATIC_DIR, image_filename)
     with open(static_path, 'wb') as f:
         f.write(response.content)
     
