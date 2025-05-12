@@ -8,7 +8,9 @@ from asyncpg import Record
 from fastapi import HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from requests import request
 
+from cache import InMemoryCache
 from constant import CURRENT_PLAYING_CACHE_KEY
 from settings import (
     APP_URL,
@@ -260,7 +262,8 @@ async def get_current_playing(request: Request):
     order by updated desc
     limit 1;
     """
-    cached = request.app.cache.get(CURRENT_PLAYING_CACHE_KEY)
+    cache: InMemoryCache = request.app.cache
+    cached = cache.get(CURRENT_PLAYING_CACHE_KEY)
     if cached:
         return JSONResponse(content=cached, status_code=200)
     
@@ -280,6 +283,45 @@ async def get_current_playing(request: Request):
     response["images"] = (
         json.loads(response.get("images")) if response.get("images") else None
     )
-    request.app.cache.set(CURRENT_PLAYING_CACHE_KEY, response, ttl=cache_ttl)
+    image_url = response.get("images")[-1].get("#text") if response.get("images") else None
+    static_image_url = download_and_save_image(image_url)    # if image is present, download the image and store it locally, and serve the static local url
+    if static_image_url:
+        response.pop("images", None)
+        host = request.headers.get("host")
+        if not host:
+            response['artwork'] = static_image_url
+        if "local" in host:
+            response['artwork'] = "http://" + host + static_image_url
+        else:
+            response['artwork'] = "https://" + host + static_image_url
+
+    cache.set(CURRENT_PLAYING_CACHE_KEY, response, ttl=cache_ttl)
 
     return JSONResponse(content=response, status_code=200)
+
+
+def download_and_save_image(image_url: str, image_filename: str = 'current_playing.png'):
+    """
+    - delete the image at static path if present with the same filename
+    - Download the image from the given URL
+    - Save the image to the specified filename
+    - Return the local static link
+    """
+    
+    static_path = os.path.join(STATIC_DIR, image_filename)
+    if os.path.exists(static_path):
+        os.remove(static_path)
+    
+    if not image_url:
+        return None
+    
+    
+    response = request('GET', image_url)
+    if response.status_code != 200:
+        return None
+    
+    with open(static_path, 'wb') as f:
+        f.write(response.content)
+    
+    return f"/static/{image_filename}"
+    
