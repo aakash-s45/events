@@ -2,6 +2,7 @@ import base64
 import json
 import logging
 import os
+import time
 from typing import List, Optional, Tuple
 import uuid
 from asyncpg import Record
@@ -284,6 +285,7 @@ async def get_current_playing(request: Request):
         json.loads(response.get("images")) if response.get("images") else None
     )
     image_url = response.get("images")[-1].get("#text") if response.get("images") else None
+
     static_image_url = download_and_save_image(image_url)    # if image is present, download the image and store it locally, and serve the static local url
     if static_image_url:
         response.pop("images", None)
@@ -319,5 +321,5 @@ def download_and_save_image(image_url: str, image_filename: str = 'current_playi
     with open(static_path, 'wb') as f:
         f.write(response.content)
     
-    return f"/static/{image_filename}"
+    return f"/static/{image_filename}?t={int(time.time())}"
     
