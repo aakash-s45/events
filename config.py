@@ -50,7 +50,8 @@ async def init_db(app: FastAPI):
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Extract the Authorization header
-        if request.method == "OPTIONS":
+        path = request.url.path
+        if request.method == "OPTIONS" or path.startswith("/static"):
             return await call_next(request)
         
         token = request.headers.get("Authorization")
